@@ -37,10 +37,10 @@ class LDA(object):
 
         alphabet = self.corpus.alphabet
 
-        for t in range(self.T):
+        for t in xrange(self.T):
 
-            sorted_types = list(map(alphabet.lookup, argsort(nwt[:, t] + beta)))
-            print('Topic %s: %s' % (t+1, ' '.join(sorted_types[-num:][::-1])))
+            sorted_types = map(alphabet.lookup, argsort(nwt[:, t] + beta))
+            print 'Topic %s: %s' % (t+1, ' '.join(sorted_types[-num:][::-1]))
 
     def save_state(self, filename):
 
@@ -76,12 +76,12 @@ class LDA(object):
 
         assert not os.listdir(dirname), 'Output directory must be empty.'
 
-        print('# documents =', D)
-        print('# tokens =', N)
-        print('# unique types =', W)
-        print('# topics =', T)
-        print('# iterations =', S)
-        print('Optimize hyperparameters =', optimize)
+        print '# documents =', D
+        print '# tokens =', N
+        print '# unique types =', W
+        print '# topics =', T
+        print '# iterations =', S
+        print 'Optimize hyperparameters =', optimize
 
         self.beta = 0.01 * ones(W)
         self.beta_sum = 0.01 * W
@@ -108,10 +108,10 @@ class LDA(object):
         plt = InteractivePlot('Iteration', 'Log Probability')
         plt.update_plot(0, lp)
 
-        print('\nIteration %s: %s' % (0, lp))
+        print '\nIteration %s: %s' % (0, lp)
         self.print_topics()
 
-        for s in range(1, self.S+1):
+        for s in xrange(1, self.S+1):
 
             sys.stdout.write('.')
 
@@ -121,7 +121,7 @@ class LDA(object):
 
                 plt.update_plot(s, lp)
 
-                print('\nIteration %s: %s' % (s, lp))
+                print '\nIteration %s: %s' % (s, lp)
                 self.print_topics()
 
                 self.save_state('%s/state.txt.%s' % (self.dirname, s))

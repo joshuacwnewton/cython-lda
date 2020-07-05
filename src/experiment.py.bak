@@ -17,7 +17,7 @@ def main():
 
     args = p.parse_args()
 
-    print(' args  ', args)
+    print ' args  ', args
 
     corpus = Corpus.load(args.input_file)
 

@@ -25,7 +25,7 @@ class Alphabet(object):
 
     def __contains__(self, s):
 
-        assert isinstance(s, str)
+        assert isinstance(s, basestring)
         return s in self._mapping
 
     def __getitem__(self, s):
@@ -33,7 +33,7 @@ class Alphabet(object):
         try:
             return self._mapping[s]
         except KeyError:
-            if not isinstance(s, str):
+            if not isinstance(s, basestring):
                 raise ValueError('Invalid key (%s): must be a string.' % (s,))
             if not self._growing:
                 return None
@@ -46,7 +46,7 @@ class Alphabet(object):
 
     def __iter__(self):
 
-        for i in range(len(self)):
+        for i in xrange(len(self)):
             yield self._reverse[i]
 
     def __len__(self):

@@ -21,7 +21,7 @@ def aggregate(regexp, col=-1, header=0):
 
     values = zeros((N, S), dtype=int)
 
-    for n in range(N):
+    for n in xrange(N):
         values[n, :] = tmp[n]
 
     if S == 1:
@@ -97,7 +97,7 @@ def get_1d_counts(data):
 
     counts = zeros(I, dtype=int)
 
-    for i in range(I):
+    for i in xrange(I):
         counts[i] = tmp[i]
 
     return counts
@@ -118,8 +118,8 @@ def get_2d_counts(data):
 
     counts = zeros((I, J), dtype=int)
 
-    for i in range(I):
-        for j in range(J):
+    for i in xrange(I):
+        for j in xrange(J):
             counts[i, j] = tmp[(i, j)]
 
     return counts
@@ -134,8 +134,8 @@ def align_topics(statefile1, statefile2):
 
     dist = zeros((T1, T2))
 
-    for i in range(T1):
-        for j in range(T2):
+    for i in xrange(T1):
+        for j in xrange(T2):
             dist[i, j] = hellinger(phi1[:, i], phi2[:, j])
 
     return dist

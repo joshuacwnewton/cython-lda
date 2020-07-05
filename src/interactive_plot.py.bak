@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     plt = InteractivePlot('x', 'y')
 
-    for x in range(100):
+    for x in xrange(100):
 
         plt.update_plot(x, x * math.sin(0.4 * x))
         time.sleep(.01)

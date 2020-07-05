@@ -1,6 +1,6 @@
 from alphabet import *
 from numpy import array, ndarray
-import pickle as pickle
+import cPickle as pickle
 
 
 class Document(object):
@@ -8,7 +8,7 @@ class Document(object):
     def __init__(self, corpus, name, tokens):
 
         assert isinstance(corpus, Corpus)
-        assert isinstance(name, str)
+        assert isinstance(name, basestring)
         assert isinstance(tokens, ndarray)
 
         self.corpus = corpus
@@ -31,7 +31,7 @@ class Corpus(object):
 
     def add(self, name, data):
 
-        assert isinstance(name, str)
+        assert isinstance(name, basestring)
         assert isinstance(data, list)
 
         tokens = array([self.alphabet[x] for x in data])
