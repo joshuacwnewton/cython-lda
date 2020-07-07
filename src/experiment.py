@@ -32,3 +32,9 @@ if __name__ == '__main__':
 #    cProfile.run('main()', 'lda_profile')
 
     main()
+
+# Mistake created:
+# - Line 29: 'list()' instead of '[]'
+#   - Slower and more obfuscated
+# - Line 14 & 15: default values are not parameterized
+#   - Should be parameterized to keep help message and default value consistent

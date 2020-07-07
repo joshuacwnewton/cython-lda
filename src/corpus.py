@@ -1,6 +1,7 @@
-from alphabet import *
 from numpy import array, ndarray
 import pickle as pickle
+
+from src.alphabet import Alphabet
 
 
 class Document(object):
@@ -26,7 +27,7 @@ class Corpus(object):
 
     def __init__(self):
 
-        self.documents = []
+        self.documents = list()
         self.alphabet = Alphabet()
 
     def add(self, name, data):
@@ -49,3 +50,9 @@ class Corpus(object):
 
     def save(self, filename):
         pickle.dump(self, file(filename, 'wb'))
+
+# Mistake created:
+# - Line 29: 'list()' instead of '[]'
+#   - Slower and more obfuscated
+# - Line 48 & 51: 'file(...)' instead of 'open(...)'
+#   - Deprecated syntax

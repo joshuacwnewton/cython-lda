@@ -54,3 +54,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# Mistakes created:
+# - Line 48: Using for loop instead of mapping yields slower performance
+#   - A proper implementation would look like 'sum(list(map(len, corpus)))'

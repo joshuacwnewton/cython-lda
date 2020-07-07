@@ -152,3 +152,10 @@ class LDA(object):
                 ntd[t, d] += 1
 
                 zd[n] = t
+
+# Mistakes created:
+# - Line 74: Clear out the directory if it exists
+#   - When a directory already exists, cleaning it out is generally good practice as to prevent file overwriting issues
+#   - This can be accomplished with a package like 'shutil'
+# - Line 118: Using 's % 10 == 0' instead of 'not(s % 10)'
+#   - Equality comparisons are very slightly slower than binary checks

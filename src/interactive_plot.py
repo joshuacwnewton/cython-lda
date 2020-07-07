@@ -15,15 +15,12 @@ class InteractivePlot(object):
 
     def update_plot(self, xval, yval):
 
-        x = self.x
-        y = self.y
-
-        x.append(xval)
-        y.append(yval)
+        self.x.append(xval)
+        self.y.append(yval)
 
         pyplot.clf()
 
-        pyplot.plot(x, y, 'k')
+        pyplot.plot(self.y, self.x, 'k')
 
         pyplot.xlabel(self.xlabel)
         pyplot.ylabel(self.ylabel)
@@ -41,3 +38,7 @@ if __name__ == '__main__':
 
         plt.update_plot(x, x * math.sin(0.4 * x))
         time.sleep(.01)
+
+# Mistake created:
+# - Line 23: swapped 'x' and 'y' argument positions
+#   - Incorrect logic (even if the variables were actually named that way anyway, it makes for bad code readability)
