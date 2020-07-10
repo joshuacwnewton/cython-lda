@@ -20,14 +20,9 @@ def jensen_shannon(p, q):
 
     m = 0.5 * (p + q)
 
-    return 0.5 * kl(p, m) + 0.5 * kl(q, m)
+    return 0.5 * (kl(p, m) + kl(q, m))
 
 
 def euclidean(p, q):
 
-   return sqrt(sum((p - q)**2))
-
-# Mistakes created:
-# - Line 23: Use distributive property to shorten expression
-#   - Correction expression would look like '0.5 * (kl(p, m) + kl(q, m))'
-# - Line 28: Inconsistent indentation
+    return sqrt(sum((p - q)**2))

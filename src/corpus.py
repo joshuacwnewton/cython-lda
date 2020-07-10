@@ -27,7 +27,7 @@ class Corpus(object):
 
     def __init__(self):
 
-        self.documents = list()
+        self.documents = []
         self.alphabet = Alphabet()
 
     def add(self, name, data):
@@ -46,13 +46,7 @@ class Corpus(object):
 
     @classmethod
     def load(cls, filename):
-        return pickle.load(file(filename, 'r'))
+        return pickle.load(open(filename, 'r'))
 
     def save(self, filename):
-        pickle.dump(self, file(filename, 'wb'))
-
-# Mistake created:
-# - Line 29: 'list()' instead of '[]'
-#   - Slower and more obfuscated
-# - Line 48 & 51: 'file(...)' instead of 'open(...)'
-#   - Deprecated syntax
+        pickle.dump(self, open(filename, 'wb'))

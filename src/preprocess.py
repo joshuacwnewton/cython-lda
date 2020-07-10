@@ -9,7 +9,7 @@ def create_stopword_list(f):
         return set()
 
     if isinstance(f, str):
-        f = file(f)
+        f = open(f, "rw+")
 
     return set(word.strip() for word in f)
 
@@ -41,11 +41,11 @@ def main():
 
     corpus = Corpus()
 
-    for name, label, data in csv.reader(open(args.input_file), delimiter='\t'):
+    for name, _, data in csv.reader(open(args.input_file), delimiter='\t'):
         corpus.add(name, tokenize(data, stopwords))
 
     print('# documents =', len(corpus))
-    print('# tokens =', sum(len(doc) for doc in corpus))
+    print('# tokens =', sum(list(map(len, corpus))))
     print('# unique types =', len(corpus.alphabet))
 
     if args.output_file:
@@ -54,7 +54,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# Mistakes created:
-# - Line 48: Using for loop instead of mapping yields slower performance
-#   - A proper implementation would look like 'sum(list(map(len, corpus)))'

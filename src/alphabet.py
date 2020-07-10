@@ -2,8 +2,8 @@ class Alphabet(object):
 
     def __init__(self):
 
-        self._mapping = dict()  # mapping from strings to integers
-        self._reverse = dict()  # reverse mapping from integers to strings
+        self._mapping = {}  # mapping from strings to integers
+        self._reverse = {}  # reverse mapping from integers to strings
 
         self._idx = 0
         self._growing = True
@@ -12,24 +12,20 @@ class Alphabet(object):
         self._growing = False
 
     def lookup(self, i):
-
         assert isinstance(i, int)
         return self._reverse[i]
 
     def plaintext(self):
-
         contents = self._reverse.items()
         contents.sort(key=lambda x: x[0])
 
         return '\n'.join('%s\t%s' % (i, s) for i, s in contents)
 
     def __contains__(self, s):
-
         assert isinstance(s, str)
         return s in self._mapping
 
     def __getitem__(self, s):
-
         try:
             return self._mapping[s]
         except KeyError:
@@ -51,7 +47,3 @@ class Alphabet(object):
 
     def __len__(self):
         return len(self._mapping)
-
-# Mistake created:
-# - Line 5 & 6: 'dict()' instead of '{}'
-#   - Slower and more obfuscated

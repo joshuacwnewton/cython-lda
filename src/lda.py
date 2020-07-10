@@ -1,7 +1,7 @@
 from corpus import *
 from interactive_plot import *
 from numpy import argsort, cumsum, log, ones, random, searchsorted, sum, zeros
-import os, sys
+import os, sys, shutil
 
 
 class LDA(object):
@@ -73,6 +73,10 @@ class LDA(object):
 
         if not os.path.exists(dirname):
             os.makedirs(dirname)
+        else:
+            print("Clearing the '{}' directory".format(dirname))
+            shutil.rmtree(dirname)
+            os.makedirs(dirname)
 
         assert not os.listdir(dirname), 'Output directory must be empty.'
 
@@ -115,7 +119,7 @@ class LDA(object):
 
             sys.stdout.write('.')
 
-            if s % 10 == 0:
+            if not(s % 10):
 
                 lp = self.log_prob()
 
@@ -157,5 +161,3 @@ class LDA(object):
 # - Line 74: Clear out the directory if it exists
 #   - When a directory already exists, cleaning it out is generally good practice as to prevent file overwriting issues
 #   - This can be accomplished with a package like 'shutil'
-# - Line 118: Using 's % 10 == 0' instead of 'not(s % 10)'
-#   - Equality comparisons are very slightly slower than binary checks
