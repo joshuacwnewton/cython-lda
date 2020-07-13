@@ -8,8 +8,8 @@ def create_stopword_list(f):
     if not f:
         return set()
 
-    if isinstance(f, basestring):
-        f = file(f)
+    if isinstance(f, str):
+        f = open(f, "rw+")
 
     return set(word.strip() for word in f)
 
@@ -41,12 +41,12 @@ def main():
 
     corpus = Corpus()
 
-    for name, label, data in csv.reader(open(args.input_file), delimiter='\t'):
+    for name, _, data in csv.reader(open(args.input_file), delimiter='\t'):
         corpus.add(name, tokenize(data, stopwords))
 
-    print '# documents =', len(corpus)
-    print '# tokens =', sum(len(doc) for doc in corpus)
-    print '# unique types =', len(corpus.alphabet)
+    print('# documents =', len(corpus))
+    print('# tokens =', sum(list(map(len, corpus))))
+    print('# unique types =', len(corpus.alphabet))
 
     if args.output_file:
         corpus.save(args.output_file)

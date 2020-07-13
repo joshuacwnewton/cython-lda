@@ -1,9 +1,11 @@
+import numbers
+
 class Alphabet(object):
 
     def __init__(self):
 
-        self._mapping = {} # mapping from strings to integers
-        self._reverse = {} # reverse mapping from integers to strings
+        self._mapping = {}  # mapping from strings to integers
+        self._reverse = {}  # reverse mapping from integers to strings
 
         self._idx = 0
         self._growing = True
@@ -12,28 +14,24 @@ class Alphabet(object):
         self._growing = False
 
     def lookup(self, i):
-
-        assert isinstance(i, int)
+        assert isinstance(i, numbers.Integral)
         return self._reverse[i]
 
     def plaintext(self):
-
         contents = self._reverse.items()
         contents.sort(key=lambda x: x[0])
 
         return '\n'.join('%s\t%s' % (i, s) for i, s in contents)
 
     def __contains__(self, s):
-
-        assert isinstance(s, basestring)
+        assert isinstance(s, str)
         return s in self._mapping
 
     def __getitem__(self, s):
-
         try:
             return self._mapping[s]
         except KeyError:
-            if not isinstance(s, basestring):
+            if not isinstance(s, str):
                 raise ValueError('Invalid key (%s): must be a string.' % (s,))
             if not self._growing:
                 return None
@@ -46,7 +44,7 @@ class Alphabet(object):
 
     def __iter__(self):
 
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             yield self._reverse[i]
 
     def __len__(self):

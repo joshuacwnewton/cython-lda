@@ -1,7 +1,7 @@
 from corpus import *
 from interactive_plot import *
 from numpy import argsort, cumsum, log, ones, random, searchsorted, sum, zeros
-import os, sys
+import os, sys, shutil
 
 
 class LDA(object):
@@ -37,16 +37,16 @@ class LDA(object):
 
         alphabet = self.corpus.alphabet
 
-        for t in xrange(self.T):
+        for t in range(self.T):
 
-            sorted_types = map(alphabet.lookup, argsort(nwt[:, t] + beta))
-            print 'Topic %s: %s' % (t+1, ' '.join(sorted_types[-num:][::-1]))
+            sorted_types = list(map(alphabet.lookup, argsort(nwt[:, t] + beta)))
+            print('Topic %s: %s' % (t+1, ' '.join(sorted_types[-num:][::-1])))
 
     def save_state(self, filename):
 
         alphabet = self.corpus.alphabet
 
-        f = open(filename, 'wb')
+        f = open(filename, 'w')
 
         for d, (doc, zd) in enumerate(zip(self.corpus, self.z)):
             for n, (w, t) in enumerate(zip(doc.tokens, zd)):
@@ -73,15 +73,19 @@ class LDA(object):
 
         if not os.path.exists(dirname):
             os.makedirs(dirname)
+        else:
+            print("Clearing the '{}' directory".format(dirname))
+            shutil.rmtree(dirname)
+            os.makedirs(dirname)
 
         assert not os.listdir(dirname), 'Output directory must be empty.'
 
-        print '# documents =', D
-        print '# tokens =', N
-        print '# unique types =', W
-        print '# topics =', T
-        print '# iterations =', S
-        print 'Optimize hyperparameters =', optimize
+        print('# documents =', D)
+        print('# tokens =', N)
+        print('# unique types =', W)
+        print('# topics =', T)
+        print('# iterations =', S)
+        print('Optimize hyperparameters =', optimize)
 
         self.beta = 0.01 * ones(W)
         self.beta_sum = 0.01 * W
@@ -108,20 +112,20 @@ class LDA(object):
         plt = InteractivePlot('Iteration', 'Log Probability')
         plt.update_plot(0, lp)
 
-        print '\nIteration %s: %s' % (0, lp)
+        print('\nIteration %s: %s' % (0, lp))
         self.print_topics()
 
-        for s in xrange(1, self.S+1):
+        for s in range(1, self.S+1):
 
             sys.stdout.write('.')
 
-            if s % 10 == 0:
+            if not(s % 10):
 
                 lp = self.log_prob()
 
                 plt.update_plot(s, lp)
 
-                print '\nIteration %s: %s' % (s, lp)
+                print('\nIteration %s: %s' % (s, lp))
                 self.print_topics()
 
                 self.save_state('%s/state.txt.%s' % (self.dirname, s))
@@ -152,3 +156,8 @@ class LDA(object):
                 ntd[t, d] += 1
 
                 zd[n] = t
+
+# Mistakes created:
+# - Line 74: Clear out the directory if it exists
+#   - When a directory already exists, cleaning it out is generally good practice as to prevent file overwriting issues
+#   - This can be accomplished with a package like 'shutil'

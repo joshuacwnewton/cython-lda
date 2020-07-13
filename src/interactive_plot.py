@@ -15,15 +15,12 @@ class InteractivePlot(object):
 
     def update_plot(self, xval, yval):
 
-        x = self.x
-        y = self.y
-
-        x.append(xval)
-        y.append(yval)
+        self.x.append(xval)
+        self.y.append(yval)
 
         pyplot.clf()
 
-        pyplot.plot(x, y, 'k')
+        pyplot.plot(self.x, self.y, 'k')
 
         pyplot.xlabel(self.xlabel)
         pyplot.ylabel(self.ylabel)
@@ -37,7 +34,7 @@ if __name__ == '__main__':
 
     plt = InteractivePlot('x', 'y')
 
-    for x in xrange(100):
+    for x in range(100):
 
         plt.update_plot(x, x * math.sin(0.4 * x))
         time.sleep(.01)

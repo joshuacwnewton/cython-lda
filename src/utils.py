@@ -20,9 +20,9 @@ def jensen_shannon(p, q):
 
     m = 0.5 * (p + q)
 
-    return 0.5 * kl(p, m) + 0.5 * kl(q, m)
+    return 0.5 * (kl(p, m) + kl(q, m))
 
 
 def euclidean(p, q):
 
-   return sqrt(sum((p - q)**2))
+    return sqrt(sum((p - q)**2))
