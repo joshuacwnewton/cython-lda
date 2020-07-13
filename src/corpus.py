@@ -46,7 +46,7 @@ class Corpus(object):
 
     @classmethod
     def load(cls, filename):
-        return pickle.load(open(filename, 'r'))
+        return pickle.load(open(filename, 'rb'))
 
     def save(self, filename):
         pickle.dump(self, open(filename, 'wb'))

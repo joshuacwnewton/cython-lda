@@ -46,7 +46,7 @@ class LDA(object):
 
         alphabet = self.corpus.alphabet
 
-        f = open(filename, 'wb')
+        f = open(filename, 'w')
 
         for d, (doc, zd) in enumerate(zip(self.corpus, self.z)):
             for n, (w, t) in enumerate(zip(doc.tokens, zd)):

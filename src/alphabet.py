@@ -1,3 +1,5 @@
+import numbers
+
 class Alphabet(object):
 
     def __init__(self):
@@ -12,7 +14,7 @@ class Alphabet(object):
         self._growing = False
 
     def lookup(self, i):
-        assert isinstance(i, int)
+        assert isinstance(i, numbers.Integral)
         return self._reverse[i]
 
     def plaintext(self):
