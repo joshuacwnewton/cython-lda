@@ -9,7 +9,7 @@ rm -rf ../src/cy_lda.c
 rm -rf ../src/cy_lda*.so
 rm -rf cy_lda.html
 
-python3 cy_setup.py build_ext --inplace
+python3 cy_setup.py build_ext --inplace --force
 
 mv build/ ../src/build/
 mv cy_lda.c ../src/cy_lda.c
