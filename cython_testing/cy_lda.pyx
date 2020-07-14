@@ -6,22 +6,20 @@ then copy the generated `build/`, `.c`, and `.so` to `src/`.
 """
 
 # from interactive_plot import *
-from numpy import argsort, cumsum, log, random, searchsorted
+from numpy import argsort, cumsum, log, random, searchsorted, pad, row_stack
 # import sys
 
 
-def print_topics(corpus, beta, T, nwt, num=5):
-    alphabet = corpus.alphabet
+def print_topics(alphabet, beta, T, nwt, num=5):
     for t in range(T):
         sorted_types = list(map(alphabet.lookup, argsort(nwt[:, t] + beta)))
         print('Topic %s: %s' % (t+1, ' '.join(sorted_types[-num:][::-1])))
 
 
-def save_state(corpus, z, filename):
-    alphabet = corpus.alphabet
+def save_state(corpus_arr, alphabet, z, filename):
     f = open(filename, 'w')
-    for d, (doc, zd) in enumerate(zip(corpus, z)):
-        for n, (w, t) in enumerate(zip(doc.tokens, zd)):
+    for d, (doc, zd) in enumerate(zip(corpus_arr, z)):
+        for n, (w, t) in enumerate(zip(doc, zd)):
             f.write('%s %s %s %s %s\n' % (d, n, w, alphabet.lookup(w), t))
     f.close()
 
@@ -34,8 +32,8 @@ def inference(S, T, corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum,
         nt.fill(0)
         ntd.fill(0)
 
-        for d, (doc, zd) in enumerate(zip(corpus, z)):
-            for n, (w, t) in enumerate(zip(doc.tokens, zd)):
+        for d, (doc, zd) in enumerate(zip(corpus_arr, z)):
+            for n, (w, t) in enumerate(zip(doc, zd)):
                 lp += log(
                     (nwt[w, t] + beta[w]) / (nt[t] + beta_sum) *
                     (ntd[t, d] + alpha[t]) / (n + alpha_sum)
@@ -47,8 +45,8 @@ def inference(S, T, corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum,
         return lp
 
     def sample_topics(init=False):
-        for d, (doc, zd) in enumerate(zip(corpus, z)):
-            for n, (w, t) in enumerate(zip(doc.tokens, zd)):
+        for d, (doc, zd) in enumerate(zip(corpus_arr, z)):
+            for n, (w, t) in enumerate(zip(doc, zd)):
                 if not init:
                     nwt[w, t] -= 1
                     nt[t] -= 1
@@ -68,6 +66,14 @@ def inference(S, T, corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum,
                 zd[n] = t
 
     random.seed(random_seed)
+
+    # Decompose corpus class so documents can use a fixed-size array
+    alphabet = corpus.alphabet
+    tokens = [doc.tokens for doc in corpus]
+    l = len(max(tokens, key=len))
+    padded_tokens = [pad(t, (0, l-len(t)), constant_values=-1) for t in tokens]
+    corpus_arr = row_stack(padded_tokens)
+
     sample_topics(init=True)
     lp = log_prob()
     # plt = InteractivePlot('Iteration', 'Log Probability')
@@ -82,5 +88,6 @@ def inference(S, T, corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum,
             # plt.update_plot(s, lp)
             print('Iteration %s: %s' % (s, lp))
             # print_topics(corpus, beta, T, nwt)
-            save_state(corpus, z, '%s/state.txt.%s' % (dirname, s))
+            save_state(corpus_arr, alphabet, z,
+                       '%s/state.txt.%s' % (dirname, s))
         sample_topics()
