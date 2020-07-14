@@ -7,6 +7,7 @@ source ../venv/bin/activate
 rm -rf ../src/build/
 rm -rf ../src/cy_lda.c
 rm -rf ../src/cy_lda*.so
+rm -rf cy_lda.html
 
 python3 cy_setup.py build_ext --inplace
 
