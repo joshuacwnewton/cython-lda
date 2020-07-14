@@ -96,10 +96,9 @@ class LDA(object):
         self.alpha = 0.1 * ones(T)
         self.alpha_sum = 0.1 * T
 
-        self.nwt = zeros((W, T), dtype=int)
-        self.nt = zeros(T, dtype=int)
-
-        self.ntd = zeros((T, D), dtype=int)
+        self.nwt = zeros((W, T), dtype=float)
+        self.nt = zeros(T, dtype=float)
+        self.ntd = zeros((T, D), dtype=float)
 
         self.z = z = []
 
