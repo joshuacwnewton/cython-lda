@@ -75,19 +75,20 @@ class LDA(object):
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         else:
-            print("Clearing the '{}' directory".format(dirname))
+            # print("Clearing the '{}' directory".format(dirname))
             shutil.rmtree(dirname)
             os.makedirs(dirname)
 
         assert not os.listdir(dirname), 'Output directory must be empty.'
 
-        print('# documents =', D)
-        print('# tokens =', N)
-        print('# unique types =', W)
-        print('# topics =', T)
-        print('# iterations =', S)
-        print('Optimize hyperparameters =', optimize)
-        print()
+        print("\nInitializing LDA...")
+        # print('# documents =', D)
+        # print('# tokens =', N)
+        # print('# unique types =', W)
+        # print('# topics =', T)
+        # print('# iterations =', S)
+        # print('Optimize hyperparameters =', optimize)
+        # print()
 
         self.beta = 0.01 * ones(W)
         self.beta_sum = 0.01 * W
