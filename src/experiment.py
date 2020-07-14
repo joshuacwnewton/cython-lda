@@ -2,6 +2,18 @@ from argparse import ArgumentParser
 from corpus import *
 from lda import *
 
+from contextlib import contextmanager
+from time import time
+
+
+@contextmanager
+def timing(description: str) -> None:
+    start = time()
+    yield
+    ellapsed_time = time() - start
+
+    print(f"{description}: {ellapsed_time}")
+
 
 def main():
     defaultTopicCount = 100
@@ -25,8 +37,10 @@ def main():
 
     lda = LDA(corpus, args.T, args.S, args.optimize, args.output_dir)
 
-    lda.inference()
-    lda.cy_inference()
+    with timing("Python/NumPy"):
+        lda.inference()
+    with timing("Cython"):
+        lda.cy_inference()
 
 
 if __name__ == '__main__':
