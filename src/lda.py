@@ -1,4 +1,4 @@
-from interactive_plot import *
+# from interactive_plot import *
 from numpy import argsort, cumsum, log, ones, random, searchsorted, sum, zeros
 import os, sys, shutil
 
@@ -113,8 +113,8 @@ class LDA(object):
 
         lp = self.log_prob()
 
-        plt = InteractivePlot('Iteration', 'Log Probability')
-        plt.update_plot(0, lp)
+        # plt = InteractivePlot('Iteration', 'Log Probability')
+        # plt.update_plot(0, lp)
 
         print('Iteration %s: %s' % (0, lp))
         # self.print_topics()
@@ -127,7 +127,7 @@ class LDA(object):
 
                 lp = self.log_prob()
 
-                plt.update_plot(s, lp)
+                # plt.update_plot(s, lp)
 
                 print('Iteration %s: %s' % (s, lp))
                 # self.print_topics()

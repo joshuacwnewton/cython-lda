@@ -3,9 +3,9 @@ Build using `python cy_setup.py build_ext --inplace`,
 then copy the generated `build/`, `.c`, and `.so` to `src/`.
 """
 
-from interactive_plot import *
+# from interactive_plot import *
 from numpy import argsort, cumsum, log, random, searchsorted
-import sys
+# import sys
 
 
 def print_topics(corpus, beta, T, nwt, num=5):
@@ -68,8 +68,8 @@ def inference(S, T, corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum,
     random.seed(random_seed)
     sample_topics(init=True)
     lp = log_prob()
-    plt = InteractivePlot('Iteration', 'Log Probability')
-    plt.update_plot(0, lp)
+    # plt = InteractivePlot('Iteration', 'Log Probability')
+    # plt.update_plot(0, lp)
     print('Iteration %s: %s' % (0, lp))
     # print_topics(corpus, beta, T, nwt)
 
@@ -77,7 +77,7 @@ def inference(S, T, corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum,
         # sys.stdout.write('.')
         if not(s % (S//10)):
             lp = log_prob()
-            plt.update_plot(s, lp)
+            # plt.update_plot(s, lp)
             print('Iteration %s: %s' % (s, lp))
             # print_topics(corpus, beta, T, nwt)
             save_state(corpus, z, '%s/state.txt.%s' % (dirname, s))
