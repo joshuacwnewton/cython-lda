@@ -2,7 +2,7 @@
 from numpy import argsort, cumsum, log, ones, random, searchsorted, sum, zeros
 import os, sys, shutil
 
-import cy_lda
+from cy_lda import inference
 
 
 class LDA(object):
@@ -162,20 +162,20 @@ class LDA(object):
                 zd[n] = t
 
     def cy_inference(self):
-        self.z = cy_lda.inference(
-            S=self.S,
-            T=self.T,
-            corpus=self.corpus,
-            z=self.z,
-            nwt=self.nwt,
-            nt=self.nt,
-            ntd=self.ntd,
-            alpha=self.alpha,
-            alpha_sum=self.alpha_sum,
-            beta=self.beta,
-            beta_sum=self.beta_sum,
-            dirname=self.dirname,
-            random_seed=self.random_seed
+        self.z = inference(
+            py_S=self.S,
+            py_T=self.T,
+            py_corpus=self.corpus,
+            py_z=self.z,
+            py_nwt=self.nwt,
+            py_nt=self.nt,
+            py_ntd=self.ntd,
+            py_alpha=self.alpha,
+            py_alpha_sum=self.alpha_sum,
+            py_beta=self.beta,
+            py_beta_sum=self.beta_sum,
+            py_dirname=self.dirname,
+            py_random_seed=self.random_seed
         )
 
 # Mistakes created:

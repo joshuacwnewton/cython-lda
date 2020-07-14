@@ -5,89 +5,159 @@ Build using `python cy_setup.py build_ext --inplace`,
 then copy the generated `build/`, `.c`, and `.so` to `src/`.
 """
 
-# from interactive_plot import *
-from numpy import argsort, cumsum, log, random, searchsorted, pad, row_stack
-# import sys
+import cython
+from numpy import random, pad, row_stack, zeros
 
 
-def print_topics(alphabet, beta, T, nwt, num=5):
-    for t in range(T):
-        sorted_types = list(map(alphabet.lookup, argsort(nwt[:, t] + beta)))
-        print('Topic %s: %s' % (t+1, ' '.join(sorted_types[-num:][::-1])))
+cdef extern from "math.h":
+    double log(double x) nogil
 
 
-def save_state(corpus_arr, alphabet, z, filename):
-    f = open(filename, 'w')
-    for d, (doc, zd) in enumerate(zip(corpus_arr, z)):
-        for n, (w, t) in enumerate(zip(doc, zd)):
-            f.write('%s %s %s %s %s\n' % (d, n, w, alphabet.lookup(w), t))
-    f.close()
+@cython.boundscheck(False)  # Deactivate bounds checking
+@cython.wraparound(False)   # Deactivate negative indexing.
+cdef log_prob(long[:, :] corpus, long[:, :] z,
+              double[:, :] nwt, double[:] nt, double[:, :] ntd,
+              double[:] alpha, double alpha_sum,
+              double[:] beta, double beta_sum):
+    cdef double lp = 0.0
+    cdef double[:, :] nwt_copy = zeros((nwt.shape[0], nwt.shape[1]))
+    cdef double[:] nt_copy = zeros(nt.shape[0])
+    cdef double[:, :] ntd_copy = zeros((ntd.shape[0], nwt.shape[1]))
+    cdef Py_ssize_t w, t, d, n
+    cdef Py_ssize_t D = corpus.shape[0]
+    cdef Py_ssize_t N = corpus.shape[1]
+
+    for d in range(D):
+        for n in range(N):
+            w = corpus[d, n]
+            t = z[d, n]
+
+            if w is -1:
+                break
+
+            lp += log(
+                (nwt_copy[w, t] + beta[w]) / (nt_copy[t] + beta_sum) *
+                (ntd_copy[t, d] + alpha[t]) / (n + alpha_sum)
+            )
+
+            nwt_copy[w, t] += 1
+            nt_copy[t] += 1
+            ntd_copy[t, d] += 1
+
+    return lp
 
 
-def inference(S, T, corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum,
-              dirname, random_seed):
-    def log_prob():
-        lp = 0.0
-        nwt.fill(0)
-        nt.fill(0)
-        ntd.fill(0)
+@cython.boundscheck(False)  # Deactivate bounds checking
+@cython.wraparound(False)   # Deactivate negative indexing.
+cdef sample_topics(Py_ssize_t T, long[:, :] corpus, long[:, :] z,
+                   double[:, :] nwt, double[:] nt, double[:, :] ntd,
+                   double[:] alpha, double[:] beta, double beta_sum, init):
+    cdef double[:] dist = zeros(T)
+    cdef double[:] dist_sum = zeros(T)
+    cdef Py_ssize_t t_idx = 0
+    cdef Py_ssize_t w, t, d, n
+    cdef Py_ssize_t D = corpus.shape[0]
+    cdef Py_ssize_t N = corpus.shape[1]
+    # Uncomment if preallocating random numbers
+    # cdef double[:, :, :] random_num = random.random((D, N, T))
+    cdef double r
 
-        for d, (doc, zd) in enumerate(zip(corpus_arr, z)):
-            for n, (w, t) in enumerate(zip(doc, zd)):
-                lp += log(
-                    (nwt[w, t] + beta[w]) / (nt[t] + beta_sum) *
-                    (ntd[t, d] + alpha[t]) / (n + alpha_sum)
-                )
-                nwt[w, t] += 1
-                nt[t] += 1
-                ntd[t, d] += 1
+    for d in range(D):
+        for n in range(N):
+            w = corpus[d, n]
+            t = z[d, n]
 
-        return lp
+            # -1 are dummy values to ensure corpus/z are fixed-length arrays
+            if w is -1:
+                break
 
-    def sample_topics(init=False):
-        for d, (doc, zd) in enumerate(zip(corpus_arr, z)):
-            for n, (w, t) in enumerate(zip(doc, zd)):
-                if not init:
-                    nwt[w, t] -= 1
-                    nt[t] -= 1
-                    ntd[t, d] -= 1
+            if not init:
+                nwt[w, t] -= 1
+                nt[t] -= 1
+                ntd[t, d] -= 1
 
-                dist = ((nwt[w, :] + beta[w]) / (nt + beta_sum) *
-                        (ntd[:, d] + alpha))
+            for t_idx in range(T):
+                dist[t_idx] = ((nwt[w, t_idx] + beta[w]) /
+                               (nt[t_idx] + beta_sum) *
+                               (ntd[t_idx, d] + alpha[t_idx]))
 
-                dist_sum = cumsum(dist)
-                r = random.random() * dist_sum[-1]
-                t = searchsorted(dist_sum, r)
+                # Cython version of np.cumsum()
+                if t_idx == 0:
+                    dist_sum[t_idx] = dist[t_idx]
+                else:
+                    dist_sum[t_idx] = dist[t_idx] + dist_sum[t_idx - 1]
 
-                nwt[w, t] += 1
-                nt[t] += 1
-                ntd[t, d] += 1
 
-                zd[n] = t
+            # Use this (and comment out random_num initialization) to validate
+            r = random.random() * dist_sum[T-1]
+            # Preallocated, but won't match RNG in Hanna's for validation
+            # r = random_num[d, n, t_idx] * dist_sum[-1]
 
-    random.seed(random_seed)
+            # Cython version of np.searchsorted()
+            if r <= dist_sum[0]:
+                t = 0
+            for t_idx in range(1, T):
+                if dist_sum[t_idx-1] < r <= dist_sum[t_idx]:
+                    t = t_idx
+                    break
 
-    # Decompose corpus class so documents can use a fixed-size array
-    alphabet = corpus.alphabet
-    tokens = [doc.tokens for doc in corpus]
-    l = len(max(tokens, key=len))
-    padded_tokens = [pad(t, (0, l-len(t)), constant_values=-1) for t in tokens]
-    corpus_arr = row_stack(padded_tokens)
+            nwt[w, t] += 1
+            nt[t] += 1
+            ntd[t, d] += 1
 
-    sample_topics(init=True)
-    lp = log_prob()
-    # plt = InteractivePlot('Iteration', 'Log Probability')
-    # plt.update_plot(0, lp)
+            z[d, n] = t
+
+
+@cython.boundscheck(False)  # Deactivate bounds checking
+@cython.wraparound(False)   # Deactivate negative indexing.
+cdef inference_loop(Py_ssize_t S, Py_ssize_t T,
+                    long[:, :] corpus, long[:, :] z,
+                    double[:, :] nwt, double[:] nt, double[:, :] ntd,
+                    double[:] alpha, double alpha_sum,
+                    double[:] beta, double beta_sum):
+    cdef Py_ssize_t s
+
+    sample_topics(T, corpus, z, nwt, nt, ntd, alpha, beta, beta_sum, True)
+    lp = log_prob(corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum)
     print('Iteration %s: %s' % (0, lp))
-    # print_topics(corpus, beta, T, nwt)
 
     for s in range(1, S+1):
-        # sys.stdout.write('.')
         if not(s % (S//10)):
-            lp = log_prob()
-            # plt.update_plot(s, lp)
+            lp = log_prob(corpus, z, nwt, nt, ntd,
+                          alpha, alpha_sum, beta, beta_sum)
             print('Iteration %s: %s' % (s, lp))
-            # print_topics(corpus, beta, T, nwt)
-            save_state(corpus_arr, alphabet, z,
-                       '%s/state.txt.%s' % (dirname, s))
-        sample_topics()
+        sample_topics(T, corpus, z, nwt, nt, ntd, alpha, beta, beta_sum, False)
+
+
+def inference(py_S, py_T, py_corpus, py_z, py_nwt, py_nt, py_ntd, py_alpha,
+               py_alpha_sum, py_beta, py_beta_sum, py_dirname, py_random_seed):
+
+    random.seed(py_random_seed)
+
+    # Decompose corpus class
+    py_alphabet = py_corpus.alphabet
+    tokens = [doc.tokens for doc in py_corpus]
+
+    # Convert lists of variable-length vectors into fixed-size arrays
+    l = len(max(tokens, key=len))
+    padded_tokens = [pad(t, (0, l-len(t)), constant_values=-1) for t in tokens]
+    py_corpus_arr = row_stack(padded_tokens)
+    padded_z = [pad(zd, (0, l-len(zd)), constant_values=-1) for zd in py_z]
+    py_z_arr = row_stack(padded_z)
+
+    # Add typing to variables
+    cdef Py_ssize_t S = py_S
+    cdef Py_ssize_t T = py_T
+    cdef long[:, :] corpus = py_corpus_arr
+    cdef long[:, :] z = py_z_arr
+    cdef double[:, :] nwt = py_nwt
+    cdef double[:] nt = py_nt
+    cdef double[:, :] ntd = py_ntd
+    cdef double[:] alpha = py_alpha
+    cdef double alpha_sum = py_alpha_sum
+    cdef double[:] beta = py_beta
+    cdef double beta_sum = py_beta_sum
+
+    inference_loop(S, T, corpus, z, nwt, nt, ntd,
+                   alpha, alpha_sum, beta, beta_sum)
+
