@@ -129,10 +129,8 @@ cdef inference_loop(Py_ssize_t S, Py_ssize_t T,
         sample_topics(T, corpus, z, nwt, nt, ntd, alpha, beta, beta_sum, False)
 
 
-def inference(py_S, py_T, py_corpus, py_z, py_nwt, py_nt, py_ntd, py_alpha,
-               py_alpha_sum, py_beta, py_beta_sum, py_dirname, py_random_seed):
-
-    random.seed(py_random_seed)
+def inference(py_S, py_T, py_corpus, py_z, py_nwt, py_nt, py_ntd,
+              py_alpha, py_alpha_sum, py_beta, py_beta_sum, py_dirname):
 
     # Decompose corpus class
     py_alphabet = py_corpus.alphabet
