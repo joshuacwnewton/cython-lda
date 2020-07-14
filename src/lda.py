@@ -87,6 +87,7 @@ class LDA(object):
         print('# topics =', T)
         print('# iterations =', S)
         print('Optimize hyperparameters =', optimize)
+        print()
 
         self.beta = 0.01 * ones(W)
         self.beta_sum = 0.01 * W
@@ -113,21 +114,21 @@ class LDA(object):
         plt = InteractivePlot('Iteration', 'Log Probability')
         plt.update_plot(0, lp)
 
-        print('\nIteration %s: %s' % (0, lp))
-        self.print_topics()
+        print('Iteration %s: %s' % (0, lp))
+        # self.print_topics()
 
         for s in range(1, self.S+1):
 
-            sys.stdout.write('.')
+            # sys.stdout.write('.')
 
-            if not(s % 10):
+            if not(s % (self.S//10)):
 
                 lp = self.log_prob()
 
                 plt.update_plot(s, lp)
 
-                print('\nIteration %s: %s' % (s, lp))
-                self.print_topics()
+                print('Iteration %s: %s' % (s, lp))
+                # self.print_topics()
 
                 self.save_state('%s/state.txt.%s' % (self.dirname, s))
 

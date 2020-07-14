@@ -69,15 +69,15 @@ def inference(S, T, corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum,
     lp = log_prob()
     plt = InteractivePlot('Iteration', 'Log Probability')
     plt.update_plot(0, lp)
-    print('\nIteration %s: %s' % (0, lp))
-    print_topics(corpus, beta, T, nwt)
+    print('Iteration %s: %s' % (0, lp))
+    # print_topics(corpus, beta, T, nwt)
 
     for s in range(1, S+1):
-        sys.stdout.write('.')
-        if not(s % 10):
+        # sys.stdout.write('.')
+        if not(s % (S//10)):
             lp = log_prob()
             plt.update_plot(s, lp)
-            print('\nIteration %s: %s' % (s, lp))
-            print_topics(corpus, beta, T, nwt)
+            print('Iteration %s: %s' % (s, lp))
+            # print_topics(corpus, beta, T, nwt)
             save_state(corpus, z, '%s/state.txt.%s' % (dirname, s))
         sample_topics()

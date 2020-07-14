@@ -12,7 +12,7 @@ def timing(description: str) -> None:
     yield
     ellapsed_time = time() - start
 
-    print(f"{description}: {ellapsed_time}")
+    print(f"For '{description}', time elapsed: {ellapsed_time}\n")
 
 
 def main():
