@@ -26,6 +26,7 @@ def main():
     lda = LDA(corpus, args.T, args.S, args.optimize, args.output_dir)
 
     lda.inference()
+    lda.cy_inference()
 
 
 if __name__ == '__main__':

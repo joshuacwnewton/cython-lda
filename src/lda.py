@@ -1,7 +1,8 @@
-from corpus import *
 from interactive_plot import *
 from numpy import argsort, cumsum, log, ones, random, searchsorted, sum, zeros
 import os, sys, shutil
+
+import cy_lda
 
 
 class LDA(object):
@@ -156,6 +157,22 @@ class LDA(object):
                 ntd[t, d] += 1
 
                 zd[n] = t
+
+    def cy_inference(self):
+        self.z = cy_lda.inference(
+            S=self.S,
+            T=self.T,
+            corpus=self.corpus,
+            z=self.z,
+            nwt=self.nwt,
+            nt=self.nt,
+            ntd=self.ntd,
+            alpha=self.alpha,
+            alpha_sum=self.alpha_sum,
+            beta=self.beta,
+            beta_sum=self.beta_sum,
+            dirname=self.dirname
+        )
 
 # Mistakes created:
 # - Line 74: Clear out the directory if it exists
