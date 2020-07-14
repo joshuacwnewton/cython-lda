@@ -25,7 +25,7 @@ def save_state(corpus, z, filename):
 
 
 def inference(S, T, corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum,
-              dirname):
+              dirname, random_seed):
     def log_prob():
         lp = 0.0
         nwt.fill(0)
@@ -65,6 +65,7 @@ def inference(S, T, corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum,
 
                 zd[n] = t
 
+    random.seed(random_seed)
     sample_topics(init=True)
     lp = log_prob()
     plt = InteractivePlot('Iteration', 'Log Probability')

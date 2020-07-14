@@ -57,7 +57,7 @@ class LDA(object):
 
     def __init__(self, corpus, T, S, optimize, dirname):
 
-#        random.seed(1000)
+        self.random_seed = 23
 
         self.corpus = corpus
 
@@ -106,6 +106,8 @@ class LDA(object):
             z.append(zeros(len(doc), dtype=int))
 
     def inference(self):
+
+        random.seed(self.random_seed)
 
         self.sample_topics(init=True)
 
@@ -172,7 +174,8 @@ class LDA(object):
             alpha_sum=self.alpha_sum,
             beta=self.beta,
             beta_sum=self.beta_sum,
-            dirname=self.dirname
+            dirname=self.dirname,
+            random_seed=self.random_seed
         )
 
 # Mistakes created:
