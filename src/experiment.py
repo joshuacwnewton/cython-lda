@@ -2,17 +2,7 @@ from argparse import ArgumentParser
 from corpus import *
 from lda import *
 
-from contextlib import contextmanager
-from time import time
-
-
-@contextmanager
-def timing(description: str) -> None:
-    start = time()
-    yield
-    ellapsed_time = time() - start
-
-    print(f"For '{description}', time elapsed: {ellapsed_time}\n")
+import cProfile
 
 
 def main():
@@ -37,10 +27,13 @@ def main():
 
     lda = LDA(corpus, args.T, args.S, args.optimize, args.output_dir)
 
-    with timing("Python/NumPy"):
-        lda.inference()
-    with timing("Cython"):
-        lda.cy_inference()
+    cProfile.runctx('lda.inference()', globals(), locals(), filename="_py")
+    cProfile.runctx('lda.cy_inference()', globals(), locals(), filename="_cy")
+
+    import pstats
+    from pstats import SortKey
+    pstats.Stats('_cy').strip_dirs().sort_stats(SortKey.TIME).print_stats(10)
+    pstats.Stats('_py').strip_dirs().sort_stats(SortKey.TIME).print_stats(10)
 
 
 if __name__ == '__main__':

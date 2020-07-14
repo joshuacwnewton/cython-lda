@@ -1,3 +1,5 @@
+# cython: profile=True
+
 """
 Build using `python cy_setup.py build_ext --inplace`,
 then copy the generated `build/`, `.c`, and `.so` to `src/`.
