@@ -2,6 +2,8 @@ import argparse, csv, re
 from corpus import *
 from numpy import *
 
+from sklearn.datasets import fetch_20newsgroups
+
 
 def create_stopword_list(f):
 
@@ -9,7 +11,7 @@ def create_stopword_list(f):
         return set()
 
     if isinstance(f, str):
-        f = open(f, "rw+")
+        f = open(f, "r")
 
     return set(word.strip() for word in f)
 
@@ -22,7 +24,6 @@ def tokenize(data, stopwords=set()):
 
 
 def main():
-
     # parse command-line arguments
 
     parser = argparse.ArgumentParser()
@@ -41,8 +42,18 @@ def main():
 
     corpus = Corpus()
 
-    for name, _, data in csv.reader(open(args.input_file), delimiter='\t'):
-        corpus.add(name, tokenize(data, stopwords))
+    if args.input_file == 'newsgroups':
+        posts = fetch_20newsgroups(remove=('headers', 'footers', 'quotes'),
+                                   shuffle=True,
+                                   random_state=1,
+                                   return_X_y=True)
+        N_SAMPLES = 2000
+        subset = (posts[0][:N_SAMPLES], posts[1][:N_SAMPLES])
+        for data, name in zip(subset[0], subset[1]):
+            corpus.add(str(name), tokenize(data, stopwords))
+    else:
+        for name, _, data in csv.reader(open(args.input_file), delimiter='\t'):
+            corpus.add(name, tokenize(data, stopwords))
 
     print('# documents =', len(corpus))
     print('# tokens =', sum(list(map(len, corpus))))
