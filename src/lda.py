@@ -1,7 +1,8 @@
-from corpus import *
-from interactive_plot import *
+# from interactive_plot import *
 from numpy import argsort, cumsum, log, ones, random, searchsorted, sum, zeros
 import os, sys, shutil
+
+from cy_lda import inference
 
 
 class LDA(object):
@@ -30,7 +31,7 @@ class LDA(object):
 
         return lp
 
-    def print_topics(self, num=5):
+    def print_topics(self, num=20):
 
         beta = self.beta
         nwt = self.nwt
@@ -56,7 +57,7 @@ class LDA(object):
 
     def __init__(self, corpus, T, S, optimize, dirname):
 
-#        random.seed(1000)
+        random.seed(1000)
 
         self.corpus = corpus
 
@@ -74,18 +75,20 @@ class LDA(object):
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         else:
-            print("Clearing the '{}' directory".format(dirname))
+            # print("Clearing the '{}' directory".format(dirname))
             shutil.rmtree(dirname)
             os.makedirs(dirname)
 
         assert not os.listdir(dirname), 'Output directory must be empty.'
 
-        print('# documents =', D)
-        print('# tokens =', N)
-        print('# unique types =', W)
-        print('# topics =', T)
-        print('# iterations =', S)
-        print('Optimize hyperparameters =', optimize)
+        print("\nInitializing LDA...")
+        # print('# documents =', D)
+        # print('# tokens =', N)
+        # print('# unique types =', W)
+        # print('# topics =', T)
+        # print('# iterations =', S)
+        # print('Optimize hyperparameters =', optimize)
+        # print()
 
         self.beta = 0.01 * ones(W)
         self.beta_sum = 0.01 * W
@@ -93,10 +96,9 @@ class LDA(object):
         self.alpha = 0.1 * ones(T)
         self.alpha_sum = 0.1 * T
 
-        self.nwt = zeros((W, T), dtype=int)
-        self.nt = zeros(T, dtype=int)
-
-        self.ntd = zeros((T, D), dtype=int)
+        self.nwt = zeros((W, T), dtype=float)
+        self.nt = zeros(T, dtype=float)
+        self.ntd = zeros((T, D), dtype=float)
 
         self.z = z = []
 
@@ -109,28 +111,29 @@ class LDA(object):
 
         lp = self.log_prob()
 
-        plt = InteractivePlot('Iteration', 'Log Probability')
-        plt.update_plot(0, lp)
+        # plt = InteractivePlot('Iteration', 'Log Probability')
+        # plt.update_plot(0, lp)
 
-        print('\nIteration %s: %s' % (0, lp))
-        self.print_topics()
+        print('Iteration %s: %s' % (0, lp))
 
         for s in range(1, self.S+1):
 
-            sys.stdout.write('.')
+            # sys.stdout.write('.')
 
-            if not(s % 10):
+            if not(s % (self.S//10)):
 
                 lp = self.log_prob()
 
-                plt.update_plot(s, lp)
+                # plt.update_plot(s, lp)
 
-                print('\nIteration %s: %s' % (s, lp))
-                self.print_topics()
+                print('Iteration %s: %s' % (s, lp))
 
                 self.save_state('%s/state.txt.%s' % (self.dirname, s))
 
             self.sample_topics()
+
+        self.print_topics()
+
 
     def sample_topics(self, init=False):
 
@@ -156,6 +159,23 @@ class LDA(object):
                 ntd[t, d] += 1
 
                 zd[n] = t
+
+    def cy_inference(self):
+        self.nwt = inference(
+            py_S=self.S,
+            py_T=self.T,
+            py_corpus=self.corpus,
+            py_z=self.z,
+            py_nwt=self.nwt,
+            py_nt=self.nt,
+            py_ntd=self.ntd,
+            py_alpha=self.alpha,
+            py_alpha_sum=self.alpha_sum,
+            py_beta=self.beta,
+            py_beta_sum=self.beta_sum,
+            py_dirname=self.dirname,
+        )
+        self.print_topics()
 
 # Mistakes created:
 # - Line 74: Clear out the directory if it exists

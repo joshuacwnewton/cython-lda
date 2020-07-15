@@ -2,6 +2,10 @@ from argparse import ArgumentParser
 from corpus import *
 from lda import *
 
+import cProfile
+import pstats
+from pstats import SortKey
+
 
 def main():
     defaultTopicCount = 100
@@ -23,9 +27,13 @@ def main():
 
     corpus = Corpus.load(args.input_file)
 
-    lda = LDA(corpus, args.T, args.S, args.optimize, args.output_dir)
+    lda1 = LDA(corpus, args.T, args.S, args.optimize, args.output_dir)
+    cProfile.runctx('lda1.inference()', globals(), locals(), filename="_py")
+    pstats.Stats('_py').strip_dirs().sort_stats(SortKey.TIME).print_stats(10)
 
-    lda.inference()
+    lda2 = LDA(corpus, args.T, args.S, args.optimize, args.output_dir)
+    cProfile.runctx('lda2.cy_inference()', globals(), locals(), filename="_cy")
+    pstats.Stats('_cy').strip_dirs().sort_stats(SortKey.TIME).print_stats(10)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 from numpy import array, ndarray
 import pickle as pickle
 
-from src.alphabet import Alphabet
+from alphabet import Alphabet
 
 
 class Document(object):
