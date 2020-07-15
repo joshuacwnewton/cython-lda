@@ -15,10 +15,10 @@ cdef extern from "math.h":
 
 @cython.boundscheck(False)  # Deactivate bounds checking
 @cython.wraparound(False)   # Deactivate negative indexing.
-cdef log_prob(long[:, ::1] corpus, long[:, ::1] z,
-              double[:, ::1] nwt, double[::1] nt, double[:, ::1] ntd,
-              double[::1] alpha, double alpha_sum,
-              double[::1] beta, double beta_sum):
+cdef double log_prob(long[:, ::1] corpus, long[:, ::1] z,
+                     double[:, ::1] nwt, double[::1] nt, double[:, ::1] ntd,
+                     double[::1] alpha, double alpha_sum,
+                     double[::1] beta, double beta_sum):
     cdef double lp = 0.0
     cdef double[:, ::1] nwt_copy = zeros((nwt.shape[0], nwt.shape[1]))
     cdef double[::1] nt_copy = zeros(nt.shape[0])
@@ -115,6 +115,7 @@ cdef inference_loop(Py_ssize_t S, Py_ssize_t T,
                     double[::1] alpha, double alpha_sum,
                     double[::1] beta, double beta_sum):
     cdef Py_ssize_t s
+    cdef double lp
 
     sample_topics(T, corpus, z, nwt, nt, ntd, alpha, beta, beta_sum, True)
     lp = log_prob(corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum)
