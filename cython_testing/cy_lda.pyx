@@ -6,7 +6,7 @@ then copy the generated `build/`, `.c`, and `.so` to `src/`.
 """
 
 import cython
-from numpy import pad, row_stack, zeros, int64
+from numpy import pad, row_stack, zeros, empty, int64
 from libc.stdlib cimport rand, RAND_MAX
 
 cdef extern from "math.h":
@@ -53,8 +53,8 @@ cdef sample_topics(Py_ssize_t T, long[:, ::1] corpus, long[:, ::1] z,
                    double[:, ::1] nwt, double[::1] nt, double[:, ::1] ntd,
                    double[::1] alpha, double[::1] beta, double beta_sum,
                    bint init):
-    cdef double[:] dist = zeros(T)
-    cdef double[:] dist_sum = zeros(T)
+    cdef double[:] dist = empty(T)
+    cdef double[:] dist_sum = empty(T)
     cdef Py_ssize_t t_idx = 0
     cdef Py_ssize_t w, t, d, n
     cdef Py_ssize_t D = corpus.shape[0]
