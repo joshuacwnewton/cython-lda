@@ -6,8 +6,8 @@ then copy the generated `build/`, `.c`, and `.so` to `src/`.
 """
 
 import cython
-from numpy import random, pad, row_stack, zeros, int64
-
+from numpy import pad, row_stack, zeros, int64
+from libc.stdlib cimport rand, RAND_MAX
 
 cdef extern from "math.h":
     double log(double x) nogil
@@ -58,8 +58,6 @@ cdef sample_topics(Py_ssize_t T, long[:, ::1] corpus, long[:, ::1] z,
     cdef Py_ssize_t w, t, d, n
     cdef Py_ssize_t D = corpus.shape[0]
     cdef Py_ssize_t N = corpus.shape[1]
-    # Uncomment if preallocating random numbers
-    # cdef double[:, :, :] random_num = random.random((D, N, T))
     cdef double r
 
     for d in range(D):
@@ -88,10 +86,10 @@ cdef sample_topics(Py_ssize_t T, long[:, ::1] corpus, long[:, ::1] z,
                     dist_sum[t_idx] = dist[t_idx] + dist_sum[t_idx - 1]
 
 
-            # Use this (and comment out random_num initialization) to validate
-            r = random.random() * dist_sum[T-1]
-            # Preallocated, but won't match RNG in Hanna's for validation
-            # r = random_num[d, n, t_idx] * dist_sum[-1]
+            # Use this to match Hanna's random state and validate
+            # r = random.random() * dist_sum[T-1]
+            # Much faster C random number generation
+            r = (rand()/RAND_MAX) * dist_sum[T-1]
 
             # Cython version of np.searchsorted()
             if r <= dist_sum[0]:
