@@ -51,7 +51,8 @@ cdef log_prob(long[:, ::1] corpus, long[:, ::1] z,
 @cython.wraparound(False)   # Deactivate negative indexing.
 cdef sample_topics(Py_ssize_t T, long[:, ::1] corpus, long[:, ::1] z,
                    double[:, ::1] nwt, double[::1] nt, double[:, ::1] ntd,
-                   double[::1] alpha, double[::1] beta, double beta_sum, init):
+                   double[::1] alpha, double[::1] beta, double beta_sum,
+                   bint init):
     cdef double[:] dist = zeros(T)
     cdef double[:] dist_sum = zeros(T)
     cdef Py_ssize_t t_idx = 0
