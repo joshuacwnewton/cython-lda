@@ -110,6 +110,7 @@ cdef sample_topics(Py_ssize_t T, long[:, ::1] corpus, long[:, ::1] z,
 
 @cython.boundscheck(False)  # Deactivate bounds checking
 @cython.wraparound(False)   # Deactivate negative indexing.
+@cython.cdivision(True)     # Deactivate division by 0 checking
 cdef inference_loop(Py_ssize_t S, Py_ssize_t T,
                     long[:, ::1] corpus, long[:, ::1] z,
                     double[:, ::1] nwt, double[::1] nt, double[:, ::1] ntd,
