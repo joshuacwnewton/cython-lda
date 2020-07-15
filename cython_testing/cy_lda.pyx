@@ -6,7 +6,7 @@ then copy the generated `build/`, `.c`, and `.so` to `src/`.
 """
 
 import cython
-from numpy import random, pad, row_stack, zeros
+from numpy import random, pad, row_stack, zeros, int64
 
 
 cdef extern from "math.h":
@@ -138,9 +138,11 @@ def inference(py_S, py_T, py_corpus, py_z, py_nwt, py_nt, py_ntd,
 
     # Convert lists of variable-length vectors into fixed-size arrays
     l = len(max(tokens, key=len))
-    padded_tokens = [pad(t, (0, l-len(t)), constant_values=-1) for t in tokens]
+    padded_tokens = [pad(t, (0, l-len(t)), constant_values=-1).astype(int64)
+                     for t in tokens]
     py_corpus_arr = row_stack(padded_tokens)
-    padded_z = [pad(zd, (0, l-len(zd)), constant_values=-1) for zd in py_z]
+    padded_z = [pad(zd, (0, l-len(zd)), constant_values=-1).astype(int64)
+                for zd in py_z]
     py_z_arr = row_stack(padded_z)
 
     # Add typing to variables
