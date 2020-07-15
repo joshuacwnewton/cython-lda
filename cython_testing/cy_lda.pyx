@@ -22,7 +22,7 @@ cdef log_prob(long[:, :] corpus, long[:, :] z,
     cdef double lp = 0.0
     cdef double[:, :] nwt_copy = zeros((nwt.shape[0], nwt.shape[1]))
     cdef double[:] nt_copy = zeros(nt.shape[0])
-    cdef double[:, :] ntd_copy = zeros((ntd.shape[0], nwt.shape[1]))
+    cdef double[:, :] ntd_copy = zeros((ntd.shape[0], ntd.shape[1]))
     cdef Py_ssize_t w, t, d, n
     cdef Py_ssize_t D = corpus.shape[0]
     cdef Py_ssize_t N = corpus.shape[1]
