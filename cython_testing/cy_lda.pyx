@@ -15,14 +15,14 @@ cdef extern from "math.h":
 
 @cython.boundscheck(False)  # Deactivate bounds checking
 @cython.wraparound(False)   # Deactivate negative indexing.
-cdef log_prob(long[:, :] corpus, long[:, :] z,
-              double[:, :] nwt, double[:] nt, double[:, :] ntd,
-              double[:] alpha, double alpha_sum,
-              double[:] beta, double beta_sum):
+cdef log_prob(long[:, ::1] corpus, long[:, ::1] z,
+              double[:, ::1] nwt, double[::1] nt, double[:, ::1] ntd,
+              double[::1] alpha, double alpha_sum,
+              double[::1] beta, double beta_sum):
     cdef double lp = 0.0
-    cdef double[:, :] nwt_copy = zeros((nwt.shape[0], nwt.shape[1]))
-    cdef double[:] nt_copy = zeros(nt.shape[0])
-    cdef double[:, :] ntd_copy = zeros((ntd.shape[0], ntd.shape[1]))
+    cdef double[:, ::1] nwt_copy = zeros((nwt.shape[0], nwt.shape[1]))
+    cdef double[::1] nt_copy = zeros(nt.shape[0])
+    cdef double[:, ::1] ntd_copy = zeros((ntd.shape[0], ntd.shape[1]))
     cdef Py_ssize_t w, t, d, n
     cdef Py_ssize_t D = corpus.shape[0]
     cdef Py_ssize_t N = corpus.shape[1]
@@ -49,9 +49,9 @@ cdef log_prob(long[:, :] corpus, long[:, :] z,
 
 @cython.boundscheck(False)  # Deactivate bounds checking
 @cython.wraparound(False)   # Deactivate negative indexing.
-cdef sample_topics(Py_ssize_t T, long[:, :] corpus, long[:, :] z,
-                   double[:, :] nwt, double[:] nt, double[:, :] ntd,
-                   double[:] alpha, double[:] beta, double beta_sum, init):
+cdef sample_topics(Py_ssize_t T, long[:, ::1] corpus, long[:, ::1] z,
+                   double[:, ::1] nwt, double[::1] nt, double[:, ::1] ntd,
+                   double[::1] alpha, double[::1] beta, double beta_sum, init):
     cdef double[:] dist = zeros(T)
     cdef double[:] dist_sum = zeros(T)
     cdef Py_ssize_t t_idx = 0
@@ -111,10 +111,10 @@ cdef sample_topics(Py_ssize_t T, long[:, :] corpus, long[:, :] z,
 @cython.boundscheck(False)  # Deactivate bounds checking
 @cython.wraparound(False)   # Deactivate negative indexing.
 cdef inference_loop(Py_ssize_t S, Py_ssize_t T,
-                    long[:, :] corpus, long[:, :] z,
-                    double[:, :] nwt, double[:] nt, double[:, :] ntd,
-                    double[:] alpha, double alpha_sum,
-                    double[:] beta, double beta_sum):
+                    long[:, ::1] corpus, long[:, ::1] z,
+                    double[:, ::1] nwt, double[::1] nt, double[:, ::1] ntd,
+                    double[::1] alpha, double alpha_sum,
+                    double[::1] beta, double beta_sum):
     cdef Py_ssize_t s
 
     sample_topics(T, corpus, z, nwt, nt, ntd, alpha, beta, beta_sum, True)
@@ -148,14 +148,14 @@ def inference(py_S, py_T, py_corpus, py_z, py_nwt, py_nt, py_ntd,
     # Add typing to variables
     cdef Py_ssize_t S = py_S
     cdef Py_ssize_t T = py_T
-    cdef long[:, :] corpus = py_corpus_arr
-    cdef long[:, :] z = py_z_arr
-    cdef double[:, :] nwt = py_nwt
-    cdef double[:] nt = py_nt
-    cdef double[:, :] ntd = py_ntd
-    cdef double[:] alpha = py_alpha
+    cdef long[:, ::1] corpus = py_corpus_arr
+    cdef long[:, ::1] z = py_z_arr
+    cdef double[:, ::1] nwt = py_nwt
+    cdef double[::1] nt = py_nt
+    cdef double[:, ::1] ntd = py_ntd
+    cdef double[::1] alpha = py_alpha
     cdef double alpha_sum = py_alpha_sum
-    cdef double[:] beta = py_beta
+    cdef double[::1] beta = py_beta
     cdef double beta_sum = py_beta_sum
 
     inference_loop(S, T, corpus, z, nwt, nt, ntd,
