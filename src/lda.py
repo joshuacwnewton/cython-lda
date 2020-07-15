@@ -31,7 +31,7 @@ class LDA(object):
 
         return lp
 
-    def print_topics(self, num=5):
+    def print_topics(self, num=20):
 
         beta = self.beta
         nwt = self.nwt
@@ -115,7 +115,6 @@ class LDA(object):
         # plt.update_plot(0, lp)
 
         print('Iteration %s: %s' % (0, lp))
-        # self.print_topics()
 
         for s in range(1, self.S+1):
 
@@ -128,11 +127,13 @@ class LDA(object):
                 # plt.update_plot(s, lp)
 
                 print('Iteration %s: %s' % (s, lp))
-                # self.print_topics()
 
                 self.save_state('%s/state.txt.%s' % (self.dirname, s))
 
             self.sample_topics()
+
+        self.print_topics()
+
 
     def sample_topics(self, init=False):
 
@@ -160,7 +161,7 @@ class LDA(object):
                 zd[n] = t
 
     def cy_inference(self):
-        self.z = inference(
+        self.nwt = inference(
             py_S=self.S,
             py_T=self.T,
             py_corpus=self.corpus,
@@ -174,6 +175,7 @@ class LDA(object):
             py_beta_sum=self.beta_sum,
             py_dirname=self.dirname,
         )
+        self.print_topics()
 
 # Mistakes created:
 # - Line 74: Clear out the directory if it exists

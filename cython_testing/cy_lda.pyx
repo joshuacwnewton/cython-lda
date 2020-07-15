@@ -111,11 +111,12 @@ cdef sample_topics(Py_ssize_t T, long[:, ::1] corpus, long[:, ::1] z,
 @cython.boundscheck(False)  # Deactivate bounds checking
 @cython.wraparound(False)   # Deactivate negative indexing.
 @cython.cdivision(True)     # Deactivate division by 0 checking
-cdef inference_loop(Py_ssize_t S, Py_ssize_t T,
-                    long[:, ::1] corpus, long[:, ::1] z,
-                    double[:, ::1] nwt, double[::1] nt, double[:, ::1] ntd,
-                    double[::1] alpha, double alpha_sum,
-                    double[::1] beta, double beta_sum):
+cdef double[:, ::1] inference_loop(Py_ssize_t S, Py_ssize_t T,
+                                   long[:, ::1] corpus, long[:, ::1] z,
+                                   double[:, ::1] nwt, double[::1] nt,
+                                   double[:, ::1] ntd,
+                                   double[::1] alpha, double alpha_sum,
+                                   double[::1] beta, double beta_sum):
     cdef Py_ssize_t s
     cdef double lp
 
@@ -129,6 +130,10 @@ cdef inference_loop(Py_ssize_t S, Py_ssize_t T,
                           alpha, alpha_sum, beta, beta_sum)
             printf('\nIteration %ld: %f', s, lp)
         sample_topics(T, corpus, z, nwt, nt, ntd, alpha, beta, beta_sum, False)
+
+    printf('\n\n')
+
+    return nwt
 
 
 def inference(py_S, py_T, py_corpus, py_z, py_nwt, py_nt, py_ntd,
@@ -160,6 +165,7 @@ def inference(py_S, py_T, py_corpus, py_z, py_nwt, py_nt, py_ntd,
     cdef double[::1] beta = py_beta
     cdef double beta_sum = py_beta_sum
 
-    inference_loop(S, T, corpus, z, nwt, nt, ntd,
-                   alpha, alpha_sum, beta, beta_sum)
+    nwt = inference_loop(S, T, corpus, z, nwt, nt, ntd,
+                         alpha, alpha_sum, beta, beta_sum)
 
+    return nwt
