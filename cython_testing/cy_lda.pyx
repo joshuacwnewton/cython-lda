@@ -8,6 +8,7 @@ then copy the generated `build/`, `.c`, and `.so` to `src/`.
 import cython
 from numpy import pad, row_stack, zeros, empty, int64
 from libc.stdlib cimport rand, RAND_MAX
+from libc.stdio cimport printf
 
 cdef extern from "math.h":
     double log(double x) nogil
@@ -119,13 +120,13 @@ cdef inference_loop(Py_ssize_t S, Py_ssize_t T,
 
     sample_topics(T, corpus, z, nwt, nt, ntd, alpha, beta, beta_sum, True)
     lp = log_prob(corpus, z, nwt, nt, ntd, alpha, alpha_sum, beta, beta_sum)
-    print('Iteration %s: %s' % (0, lp))
+    printf('\nIteration %d: %f', 0, lp)
 
     for s in range(1, S+1):
         if not(s % (S//10)):
             lp = log_prob(corpus, z, nwt, nt, ntd,
                           alpha, alpha_sum, beta, beta_sum)
-            print('Iteration %s: %s' % (s, lp))
+            printf('\nIteration %ld: %f', s, lp)
         sample_topics(T, corpus, z, nwt, nt, ntd, alpha, beta, beta_sum, False)
 
 
