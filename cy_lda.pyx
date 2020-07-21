@@ -10,6 +10,8 @@ from libc.stdio cimport printf
 
 cdef extern from "math.h":
     double log(double x) nogil
+    double ceil(double x) nogil
+
 
 cdef class CythonLDA:
     cdef long[:, ::1] corpus
@@ -157,9 +159,10 @@ cdef class CythonLDA:
         lp = self._log_prob()
         printf('\nIteration %d: %f', 0, lp)
 
+        update_every = ceil(self.S/10)
         for s in range(1, self.S+1):
             self._sample_topics()
-            if not(s % (self.S//10)):
+            if s % update_every == 0:
                 lp = self._log_prob()
                 printf('\nIteration %ld: %f', s, lp)
 
